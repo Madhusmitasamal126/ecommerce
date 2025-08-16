@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <h2>Create an Account</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+       {% include "alert.html" %}
+        <label>Username:</label>
+        <input type="text" name="username" placeholder="username" required><br><br>
+        
+        <label>Email:</label>
+        <input type="email" name="email" placeholder="email" required><br><br>
+        
+        <label>Password:</label>
+        <input type="password" name="password1" placeholder="Password" required><br><br>
+        
+        <label>Confirm Password:</label>
+        <input type="password" name="password2" placeholder="confirm password" required><br><br>
+        
+        <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+</body>
+</html>
