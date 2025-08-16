@@ -23,7 +23,7 @@ from ecom.views import home_page
 
 urlpatterns = [
     path('', home_page, name='home'),
-    path('home/', home_page), 
+
     path('account/', include('account.urls')),
     path('admin/', admin.site.urls),
 ]
