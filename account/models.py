@@ -1,10 +1,27 @@
 from django.db import models
 from django.contrib.auth.models import User
 from ecom.models import BaseModel
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import uuid
+from ecom.emails import send_account_activation_email
 
 class Profile(BaseModel):
-    user=models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    is_email=models.BooleanField(default=False)
-    email_tokan=models.CharField(max_length=100, null=True, blank=True)
-    profile_img=models.ImageField(upload_to='profile_images')
-# Create your models here.
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    is_email_verified = models.BooleanField(default=False)
+    email_token = models.CharField(max_length=100, null=True, blank=True)
+    profile_img = models.ImageField(upload_to='profile_images', null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    try:
+        if created:
+            email_token = str(uuid.uuid4())
+            Profile.objects.create(user=instance, email_token=email_token)
+            if instance.email:
+                send_account_activation_email(instance, email_token)
+    except Exception as e:
+        print("Error in create_user_profile:", e)
