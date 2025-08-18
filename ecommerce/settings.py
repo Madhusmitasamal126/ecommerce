@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'ecom',
     'product',
    'account.apps.AccountConfig',
+   'home',
 ]
 
 MIDDLEWARE = [

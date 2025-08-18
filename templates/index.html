@@ -1,98 +1,36 @@
+{% extends "base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecommerce Store</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-<img src="{% static 'images/img1.jpg' %}" alt="Product">
-</head>
-<body>
+{% block title %}Home - MyShop{% endblock %}
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="#">MyShop</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Shop</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Categories</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-            </ul>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search">
-                <button class="btn btn-outline-light" type="submit">Search</button>
-            </form>
-        </div>
-    </div>
-</nav>
-
+{% block content %}
 <!-- Hero Section -->
-<section class="hero text-center">
-    <h1 class="display-4 fw-bold">Welcome to MyShop</h1>
-    <p class="lead">Find your style, shop with confidence</p>
-    <a href="#" class="btn btn-primary btn-lg">Shop Now</a>
+<section class="text-center mb-5">
+  <h1 class="display-4 fw-bold">Welcome to MyShop</h1>
+  <p class="lead">Find your style, shop with confidence</p>
+  <a href="#" class="btn btn-primary btn-lg">Shop Now</a>
 </section>
 
-<!-- Product Section -->
-<div class="container py-5">
-    <h2 class="text-center mb-4">Featured Products</h2>
-    <div class="row g-4">
-        <!-- Product Card -->
-        <div class="card product-card shadow-sm">
-    <img src="{% static 'images/img1.jpg' %}" class="card-img-top" alt="Product">
-    <div class="card-body text-center">
-        <h5 class="card-title">Stylish Shoes</h5>
-        <p class="card-text text-muted">$49.99</p>
-        <a href="#" class="btn btn-sm btn-primary">Add to Cart</a>
-     </div>
-     </div>
-        <!-- Repeat product cards -->
-        <div class="col-md-3 col-sm-6">
-            <div class="card product-card shadow-sm">
-                <img src="https://source.unsplash.com/400x400/?watch" class="card-img-top" alt="Product">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Luxury Watch</h5>
-                    <p class="card-text text-muted">$129.99</p>
-                    <a href="#" class="btn btn-sm btn-primary">Add to Cart</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="card product-card shadow-sm">
-                <img src="https://source.unsplash.com/400x400/?bag" class="card-img-top" alt="Product">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Designer Bag</h5>
-                    <p class="card-text text-muted">$89.99</p>
-                    <a href="#" class="btn btn-sm btn-primary">Add to Cart</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="card product-card shadow-sm">
-                <img src="https://source.unsplash.com/400x400/?headphones" class="card-img-top" alt="Product">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Wireless Headphones</h5>
-                    <p class="card-text text-muted">$59.99</p>
-                    <a href="#" class="btn btn-sm btn-primary">Add to Cart</a>
-                </div>
-            </div>
-        </div>
+<!-- Featured Products -->
+<h2 class="text-center mb-4">Featured Products</h2>
+<div class="row g-4">
+  {% for product in products %}
+  <div class="col-md-3 col-sm-6">
+    <div class="card shadow-sm h-100">
+      {% if product.images.first %}
+        <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.pro_name }}">
+      {% else %}
+        <img src="{% static 'img/no-image.png' %}" class="card-img-top" alt="No image">
+      {% endif %}
+      <div class="card-body text-center">
+        <h5 class="card-title">{{ product.pro_name }}</h5>
+        <p class="card-text text-success fw-bold">₹{{ product.price }}</p>
+        <a href="{% url 'get_product' product.slug %}" class="btn btn-sm btn-outline-primary">View</a>
+      </div>
     </div>
+  </div>
+  {% empty %}
+  <p class="text-center">No products available.</p>
+  {% endfor %}
 </div>
-
-<!-- Footer -->
-<footer class="bg-dark text-white text-center py-3">
-    <p class="mb-0">&copy; 2025 MyShop. All rights reserved.</p>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

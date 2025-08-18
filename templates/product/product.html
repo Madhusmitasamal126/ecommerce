@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ product.pro_name }} - MyShop{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- Product Image -->
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      {% if product.images.first %}
+        <img src="{{ product.images.first.image.url }}" class="img-fluid rounded" alt="{{ product.pro_name }}">
+      {% else %}
+        <img src="{% static 'img/no-image.png' %}" class="img-fluid rounded" alt="No image">
+      {% endif %}
+    </div>
+    <!-- Gallery -->
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      {% for img in product.images.all %}
+        <img src="{{ img.image.url }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" alt="{{ product.pro_name }}">
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Product Details -->
+  <div class="col-md-6">
+    <h2 class="fw-bold">{{ product.pro_name }}</h2>
+    <h4 class="text-success mt-3">₹{{ product.price }}</h4>
+    <p class="mt-4">{{ product.product_desc }}</p>
+    <div class="d-flex gap-3 mt-4">
+      <a href="#" class="btn btn-primary btn-lg"><i class="bi bi-cart-plus"></i> Add to Cart</a>
+      <a href="#" class="btn btn-success btn-lg"><i class="bi bi-bag-check"></i> Buy Now</a>
+    </div>
+  </div>
+</div>
+
+<!-- Related Products -->
+<hr class="my-5">
+<h3 class="mb-4">Related Products</h3>
+<div class="row">
+  {% for item in related_products %}
+  <div class="col-md-3">
+    <div class="card shadow-sm h-100">
+      {% if item.images.first %}
+        <img src="{{ item.images.first.image.url }}" class="card-img-top" alt="{{ item.pro_name }}">
+      {% else %}
+        <img src="{% static 'img/no-image.png' %}" class="card-img-top" alt="No image">
+      {% endif %}
+      <div class="card-body text-center">
+        <h6 class="card-title">{{ item.pro_name }}</h6>
+        <p class="text-success fw-bold">₹{{ item.price }}</p>
+        <a href="{% url 'product_detail' item.slug %}" class="btn btn-sm btn-outline-primary">View</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p>No related products found.</p>
+  {% endfor %}
+</div>
+{% endblock %}
