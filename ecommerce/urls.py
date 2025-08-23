@@ -22,10 +22,11 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from ecom.views import home_page
 
 urlpatterns = [
-    path('', home_page, name='home'),
+    path('', include('home.urls')),
+    path('product/', include('product.urls')),
 
     path('account/', include('account.urls')),
-    path('admin/', admin.site.urls),
+    path('admin-panel/', admin.site.urls),
 ]
 if settings.DEBUG:
     urlpatterns+= static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

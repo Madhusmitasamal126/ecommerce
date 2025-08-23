@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ecom',
     'product',
-    'account',
+   'account.apps.AccountConfig',
+   'home',
 ]
 
 MIDDLEWARE = [
@@ -117,21 +118,22 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-STATIC_ROOT='staticfiles'
+# Static files
 STATIC_URL = '/static/'
-
-STATIC_URL = '/static/'
-STATIC_ROOT=os.path.join(BASE_DIR, 'staticfiles')
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-MEDIA_ROOT= os.path.join(BASE_DIR, 'public/static')
-MEDIA_URL='/media/'
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# settings.py
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587  # TLS port
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False  # must be False if TLS is True
 
+EMAIL_HOST_USER = "madhusmitasamal930@gmail.com"
+EMAIL_HOST_PASSWORD = "bfatfvknkzgdnqog"  # Gmail App Password

@@ -4,11 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <style>
+        #login-page div{
+            font-size: 20px;
+            font-weight:italic;
+            color: black;
+            background-image: url("/static/img/na.jpg");
+            background-repeat: no-repeat;
+            background-size:cover;
+            color:red;
+        }
+    </style>
 </head>
-<body>
-    <h2>Login</h2>
-    <form method="post">
+<body class="container align-top" id="login-page">
+    <div class="text-center border border-secondary bg-danger-subtle p-4 mt-5 w-50 mx-auto rounded-5">
+    <h2 class="text-center">Login</h2>
+    <form method="POST" class="text-center">
         {% csrf_token %}
         <label>Username:</label>
         <input type="text" name="username"><br><br>
@@ -16,7 +29,8 @@
         <label>Password:</label>
         <input type="password" name="password"><br><br>
 
-        <button type="submit">Login</button>
+        <button type="submit" class="rounded-pill bg-success text-white p-2 m-2">Login</button>
     </form>
+</div>
 </body>
 </html>
