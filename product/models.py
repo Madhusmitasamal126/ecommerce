@@ -1,6 +1,7 @@
 from django.db import models
 from ecom.models import BaseModel
 from django.utils.text import slugify
+from django.contrib.auth.models import User
 
 
 class Category(BaseModel):
@@ -9,7 +10,8 @@ class Category(BaseModel):
     slug = models.SlugField(unique=True, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.cat_name)
+        if not self.slug:
+            self.slug = slugify(self.cat_name)
         super(Category, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -42,11 +44,37 @@ class Product(BaseModel):
     size_variant = models.ManyToManyField(SizeVariant, blank=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.pro_name)
+        if not self.slug:
+            self.slug = slugify(self.pro_name)
         super(Product, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.pro_name
+
+    def get_product_price(self, size=None, color=None):
+        """Return base + size + color variant price if provided."""
+        final_price = self.price
+
+        if size:
+            size_variant = self.size_variant.filter(size_name=size).first()
+            if size_variant:
+                final_price += size_variant.price
+
+        if color:
+            color_variant = self.color_variant.filter(color_name=color).first()
+            if color_variant:
+                final_price += color_variant.price
+
+        return final_price
+
+    def average_rating(self):
+        reviews = self.reviews.all()
+        if reviews.exists():
+            return round(sum(r.rating for r in reviews) / reviews.count(), 1)
+        return 0
+
+    def review_count(self):
+        return self.reviews.count()
 
 
 class ProductImage(BaseModel):
@@ -55,3 +83,17 @@ class ProductImage(BaseModel):
 
     def __str__(self):
         return f"Image of {self.product.pro_name}"
+
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, related_name="reviews", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)], default=1)
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.rating}⭐"

@@ -4,26 +4,105 @@
 {% block title %}Home - MyShop{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="text-center mb-5">
-  <h1 class="display-4 fw-bold">Welcome to MyShop</h1>
-  <p class="lead">Find your style, shop with confidence</p>
-  <a href="#" class="btn btn-primary btn-lg">Shop Now</a>
-</section>
 
-<!-- Featured Products -->
-<h2 class="text-center mb-4">Featured Products</h2>
-<div class="row g-4">
+<!-- 🔹 Hero Carousel -->
+<div id="heroCarousel" class="carousel slide mb-5 shadow-sm rounded" data-bs-ride="carousel">
+  <div class="carousel-inner rounded">
+    <div class="carousel-item active">
+      <img src="{% static 'img/banner1.jpg' %}" class="d-block w-100" alt="Banner 1">
+      <div class="carousel-caption d-none d-md-block">
+        <h2 class="fw-bold">New Season Arrivals</h2>
+        <p>Check out all the new trends</p>
+        <a href="#" class="btn btn-primary btn-lg">Shop Now</a>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'img/banner2.jpg' %}" class="d-block w-100" alt="Banner 2">
+      <div class="carousel-caption d-none d-md-block">
+        <h2 class="fw-bold">Exclusive Discounts</h2>
+        <p>Grab your favorite items at lowest prices</p>
+        <a href="#" class="btn btn-warning btn-lg">Explore Deals</a>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'img/banner3.jpg' %}" class="d-block w-100" alt="Banner 3">
+      <div class="carousel-caption d-none d-md-block">
+        <h2 class="fw-bold">Shop by Style</h2>
+        <p>From casual to classic, we have it all</p>
+        <a href="#" class="btn btn-light btn-lg">Browse Now</a>
+      </div>
+    </div>
+     <div class="carousel-item">
+      <img src="{% static 'img/banner7.jpg' %}" class="d-block w-100" alt="Banner 3">
+      <div class="carousel-caption d-none d-md-block">
+        <h2 class="fw-bold">Shop by Style</h2>
+        <p>From casual to classic, we have it all</p>
+        <a href="#" class="btn btn-light btn-lg">Browse Now</a>
+      </div>
+    </div>
+     <div class="carousel-item">
+      <img src="{% static 'img/banner4.jpg' %}" class="d-block w-100" alt="Banner 3">
+      <div class="carousel-caption d-none d-md-block">
+        <h2 class="fw-bold">Shop by Style</h2>
+        <p>From casual to classic, we have it all</p>
+        <a href="#" class="btn btn-light btn-lg">Browse Now</a>
+      </div>
+    </div>
+     <div class="carousel-item">
+      <img src="{% static 'img/banner6.jpg' %}" class="d-block w-100" alt="Banner 3">
+      <div class="carousel-caption d-none d-md-block">
+        <h2 class="fw-bold">Shop by Style</h2>
+        <p>From casual to classic, we have it all</p>
+        <a href="#" class="btn btn-light btn-lg">Browse Now</a>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+</div>
+
+<!-- 🔹 Shop by Category -->
+<h2 class="text-center fw-bold mb-4">Shop by Category</h2>
+<div class="row g-4 mb-5">
+  {% for category in categories %}
+  <div class="col-md-3 col-sm-6">
+    <div class="card border-0 shadow-sm text-center h-100 category-card">
+      {% if category.cat_img %}
+        <img src="{{ category.cat_img.url }}" class="card-img-top rounded" alt="{{ category.cat_name }}">
+      {% else %}
+        <img src="{% static 'img/no-image.png' %}" class="card-img-top rounded" alt="No image">
+      {% endif %}
+      <div class="card-body">
+        <h5 class="card-title fw-semibold">{{ category.cat_name }}</h5>
+        <a href="{% url 'category_detail' category.slug %}" class="btn btn-outline-primary btn-sm">Explore</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-center">No categories available.</p>
+  {% endfor %}
+</div>
+
+<!-- 🔹 Featured Products -->
+<h2 class="text-center fw-bold mb-4">Featured Products</h2>
+<div class="row g-4 mb-5">
   {% for product in products %}
   <div class="col-md-3 col-sm-6">
-    <div class="card shadow-sm h-100">
-      {% if product.images.first %}
-        <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.pro_name }}">
-      {% else %}
-        <img src="{% static 'img/no-image.png' %}" class="card-img-top" alt="No image">
-      {% endif %}
+    <div class="card shadow-sm h-100 border-0 product-card">
+      <div class="position-relative">
+        {% if product.images.first %}
+          <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.pro_name }}">
+        {% else %}
+          <img src="{% static 'img/no-image.png' %}" class="card-img-top" alt="No image">
+        {% endif %}
+        <span class="badge bg-danger position-absolute top-0 start-0 m-2">New</span>
+      </div>
       <div class="card-body text-center">
-        <h5 class="card-title">{{ product.pro_name }}</h5>
+        <h5 class="card-title fw-semibold">{{ product.pro_name }}</h5>
         <p class="card-text text-success fw-bold">₹{{ product.price }}</p>
         <a href="{% url 'get_product' product.slug %}" class="btn btn-sm btn-outline-primary">View</a>
       </div>
@@ -33,4 +112,29 @@
   <p class="text-center">No products available.</p>
   {% endfor %}
 </div>
+
+<!-- 🔹 CTA Banner -->
+<div class="p-5 text-center rounded shadow-lg position-relative overflow-hidden" 
+     style="background: linear-gradient(135deg, #0d6efd, #6610f2); color:white;">
+  
+  <!-- Animated background shapes -->
+  <div class="position-absolute top-0 start-0 w-100 h-100" 
+       style="background: url('https://www.transparenttextures.com/patterns/connected.png'); 
+              opacity: 0.15;">
+  </div>
+
+  <!-- Content -->
+  <div class="position-relative">
+    <h3 class="fw-bold display-6 mb-3 animate__animated animate__fadeInDown">
+      🎉 Don’t Miss Out on Exclusive Offers!
+    </h3>
+    <p class="lead mb-4 animate__animated animate__fadeInUp">
+      Sign up now and get the latest deals straight to your inbox.
+    </p>
+    <a href="#" class="btn btn-warning btn-lg px-5 fw-semibold shadow-lg rounded-pill animate__animated animate__pulse animate__infinite">
+      Join Now
+    </a>
+  </div>
+</div>
+
 {% endblock %}
