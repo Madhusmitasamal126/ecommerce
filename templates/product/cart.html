@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4 fw-bold">🛒 Your Cart</h2>
+
+    {% if items %}
+    <div class="row">
+        <!-- Cart Items Table -->
+        <div class="col-lg-8">
+            <div class="table-responsive shadow-sm rounded-3">
+                <table class="table align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price (₹)</th>
+                            <th>Quantity</th>
+                            <th>Size</th>
+                            <th>Color</th>
+                            <th>Subtotal (₹)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>
+                                {% if item.product.images.first %}
+                                <img src="{{ item.product.images.first.image.url }}" width="60" class="rounded">
+                                {% else %}
+                                <img src="{% static 'img/no-image.png' %}" width="60" class="rounded">
+                                {% endif %}
+                            </td>
+                            <td>{{ item.product.pro_name }}</td>
+                            <td>{{ item.product.price }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.selected_size|default:"-" }}</td>
+                            <td>{{ item.selected_color|default:"-" }}</td>
+                            <td>{{ item.total_price }}</td>
+                            <td>
+                                <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-danger btn-sm">
+                                    Remove
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Coupon & Total Section -->
+        <div class="col-lg-4">
+            <!-- Coupon Box -->
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Apply Coupon</h5>
+                    <form method="POST" action="{% url 'cart' %}" class="d-flex">
+                        {% csrf_token %}
+                        <input type="text" name="coupon_code" class="form-control me-2" placeholder="Coupon code">
+                        <button class="btn btn-primary" type="submit">Apply</button>
+                    </form>
+
+                    {% if cart.coupon %}
+                        <div class="mt-2 alert alert-success py-2">
+                            ✅ Coupon <strong>{{ cart.coupon.code }}</strong> applied!  
+                            <br> You saved ₹{{ cart.coupon.discount_price }}
+                            <a href="{% url 'clear_coupon' %}" class="text-danger small ms-2">Remove</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Total Box -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Order Summary</h5>
+                    <p>Subtotal: <strong>₹{{ subtotal }}</strong></p>
+                    {% if cart.coupon %}
+                        <p class="text-success">Discount: - ₹{{ cart.coupon.discount_price }}</p>
+                    {% endif %}
+                    <h4 class="fw-bold">Total: ₹{{ total }}</h4>
+                    <a href="/checkout/" class="btn btn-success w-100 mt-3">Proceed to Checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="alert alert-info text-center py-4">
+        Your cart is empty. <a href="/" class="btn btn-outline-primary ms-2">Continue Shopping</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
