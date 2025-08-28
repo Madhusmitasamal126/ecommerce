@@ -92,21 +92,64 @@
       {% endif %}
 
       <!-- Quantity Selector -->
-      <div class="mt-3">
-        <label class="form-label fw-bold">Quantity:</label>
-        <div class="input-group" style="width: 120px;">
-          <button class="btn btn-outline-secondary" type="button" onclick="changeQty(-1)">-</button>
-          <input type="text" class="form-control text-center" id="quantity" value="1" readonly>
-          <button class="btn btn-outline-secondary" type="button" onclick="changeQty(1)">+</button>
-        </div>
-      </div>
+      <!-- Quantity Selector -->
+<div class="mt-3">
+  <label class="form-label fw-bold">Quantity:</label>
+  <div class="input-group" style="width: 120px;">
+    <button class="btn btn-outline-secondary" type="button" onclick="changeQty(-1)">-</button>
+    <input type="text" class="form-control text-center" id="quantity" value="1" readonly>
+    <button class="btn btn-outline-secondary" type="button" onclick="changeQty(1)">+</button>
+  </div>
+  <input type="hidden" id="formQuantity" name="quantity" value="1">
+</div>
+
+<script>
+function changeQty(amount){
+  let qtyInput = document.getElementById("quantity");
+  let formQty = document.getElementById("formQuantity");
+  
+  // parseInt safely
+  let current = parseInt(qtyInput.value) || 1;
+
+  // prevent quantity < 1
+  let newQty = current + amount;
+  if(newQty < 1) newQty = 1;
+
+  // update both visible and hidden inputs
+  qtyInput.value = newQty;
+  formQty.value = newQty;
+}
+</script>
+
 
       <!-- Buttons -->
       <div class="d-flex gap-3 mt-4">
-        <a href="#" class="btn btn-primary btn-lg"><i class="bi bi-cart-plus"></i> Add to Cart</a>
-        <a href="#" class="btn btn-success btn-lg"><i class="bi bi-bag-check"></i> Buy Now</a>
-        <a href="#" class="btn btn-outline-danger btn-lg"><i class="bi bi-heart"></i></a>
-      </div>
+  <!-- Add to Cart -->
+  <form action="{% url 'add_to_cart' product.id %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="quantity" id="formQuantity" value="1">
+    <input type="hidden" name="size" value="">
+    <input type="hidden" name="color" value="">
+    <button type="submit" class="btn btn-primary btn-lg">
+      <i class="bi bi-cart-plus"></i> Add to Cart
+    </button>
+  </form>
+
+  <!-- Buy Now -->
+  <form action="{% url 'buy_now' product.id %}" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="quantity" id="formQuantityBuy" value="1">
+    <input type="hidden" name="size" value="">
+    <input type="hidden" name="color" value="">
+    <button type="submit" class="btn btn-success btn-lg">
+      <i class="bi bi-bag-check"></i> Buy Now
+    </button>
+  </form>
+
+  <!-- Wishlist (future feature) -->
+  <a href="#" class="btn btn-outline-danger btn-lg"><i class="bi bi-heart"></i></a>
+</div>
+
     </div>
   </div>
 
