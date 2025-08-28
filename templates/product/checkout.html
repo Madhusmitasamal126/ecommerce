@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Checkout</h2>
+
+    {% if cart_items %}
+        <ul>
+            {% for item in cart_items %}
+                <li>
+                    {{ item.product.pro_name }}
+                    (x{{ item.quantity }}) – ₹{{ item.product.get_product_price }}
+                </li>
+            {% endfor %}
+        </ul>
+        <p><strong>Total: ₹{{ total_price }}</strong></p>
+    {% else %}
+        <p>Your cart is empty. <a href="{% url 'index' %}">Continue shopping</a></p>
+    {% endif %}
+</div>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Shipping Address</label>
+      <textarea name="address" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Place Order</button>
+  </form>
+</div>
+{% endblock %}

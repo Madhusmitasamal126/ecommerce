@@ -177,3 +177,4 @@ def clear_coupon(request):
     else:
         messages.warning(request, "No coupon applied.")
     return redirect("cart")
+
