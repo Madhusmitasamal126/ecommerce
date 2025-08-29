@@ -6,15 +6,15 @@ from django.contrib.auth.models import User
 
 class Category(BaseModel):
     cat_name = models.CharField(max_length=100)
-    cat_img = models.ImageField(upload_to='category_images/')
-    slug = models.SlugField(unique=True, null=True, blank=True)
+    cat_img = models.ImageField(upload_to='category_images/', blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.cat_name)
-        super(Category, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.cat_name
 
 
@@ -97,3 +97,8 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.rating}⭐"
+class Coupon(BaseModel):
+    coupon_code = models.CharField(max_length=50, unique=True)
+    is_expired= models.BooleanField(default=False)
+    discount_price= models.IntegerField(default=100)
+    minimun_amount= models.IntegerField(default=1000)
