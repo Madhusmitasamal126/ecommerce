@@ -5,26 +5,23 @@
     <h2>Checkout</h2>
 
     {% if cart_items %}
-        <ul>
+        <ul class="list-group mb-3">
             {% for item in cart_items %}
-                <li>
-                    {{ item.product.pro_name }}
-                    (x{{ item.quantity }}) – ₹{{ item.product.get_product_price }}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ item.product.pro_name }} (x{{ item.quantity }})
+                    <span>₹{{ item.total_price|floatformat:2 }}</span>
                 </li>
             {% endfor %}
         </ul>
-        <p><strong>Total: ₹{{ total_price }}</strong></p>
+
+        <p><strong>Total: ₹{{ total_price|floatformat:2 }}</strong></p>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary mt-3">Proceed to Address</button>
+        </form>
     {% else %}
         <p>Your cart is empty. <a href="{% url 'index' %}">Continue shopping</a></p>
     {% endif %}
-</div>
-<form method="post">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label class="form-label">Shipping Address</label>
-      <textarea name="address" class="form-control" required></textarea>
-    </div>
-    <button type="submit" class="btn btn-success">Place Order</button>
-  </form>
 </div>
 {% endblock %}

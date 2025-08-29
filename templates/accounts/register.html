@@ -4,12 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <style>
+         #register div{
+            font-size: 20px;
+            font-weight:italic;
+            color: black;
+            background-image: url("/static/img/wl.jpg");
+            background-repeat: no-repeat;
+            background-size:cover;
+            color:white;
+        }
+    </style>
 </head>
-<body>
+<body id="register">
+    <div class="text-center border border-secondary bg-danger-subtle p-4 mt-5 w-50 mx-auto rounded-5">
     <h2>Create an Account</h2>
     
-    <form method="post">
+    <form method="POST">
         {% csrf_token %}
        {% include "alert.html" %}
         <label>Username:</label>
@@ -24,9 +36,10 @@
         <label>Confirm Password:</label>
         <input type="password" name="password2" placeholder="confirm password" required><br><br>
         
-        <button type="submit">Register</button>
+        <button type="submit" class="rounded-pill bg-success text-white">Register</button>
     </form>
 
-    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    <p>Already have an account? <a href="{% url 'login' %}" >Login here</a></p>
+    </div>
 </body>
 </html>

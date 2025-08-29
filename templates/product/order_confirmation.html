@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+        <h2 class="fw-bold mt-3 text-success">Order Confirmed!</h2>
+        <p class="lead">Thank you for your order, {{ checkout_data.full_name }}.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white fw-bold">
+                    <i class="bi bi-info-circle"></i> Order Details
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Name:</strong> {{ checkout_data.full_name }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Phone:</strong> {{ checkout_data.phone }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Address:</strong> 
+                            {{ checkout_data.street_address }}, {{ checkout_data.city }}, {{ checkout_data.state }}, {{ checkout_data.postal_code }}, {{ checkout_data.country }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Optional: Go to Home or Track Order -->
+            <div class="text-center mt-4">
+                <a href="{% url 'index' %}" class="btn btn-primary me-2">
+                    <i class="bi bi-house-door"></i> Back to Home
+                </a>
+                <a href="{% url 'orders' %}" class="btn btn-outline-success">
+                    <i class="bi bi-truck"></i> Track Orders
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card-header i {
+    margin-right: 0.5rem;
+}
+</style>
+{% endblock %}

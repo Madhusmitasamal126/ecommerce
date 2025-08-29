@@ -84,7 +84,8 @@
                         <p class="text-success">Discount: - ₹{{ cart.coupon.discount_price }}</p>
                     {% endif %}
                     <h4 class="fw-bold">Total: ₹{{ total }}</h4>
-                    <a href="/checkout/" class="btn btn-success w-100 mt-3">Proceed to Checkout</a>
+                    <a href="{% url 'checkout' %}" class="btn btn-success w-100 mt-3">Proceed to Checkout</a>
+
                 </div>
             </div>
         </div>

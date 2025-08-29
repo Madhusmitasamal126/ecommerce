@@ -72,3 +72,16 @@ def create_profile_and_cart(sender, instance, created, **kwargs):
         Cart.objects.create(user=instance)
         if instance.email:
             send_account_activation_email(instance.email, token)
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
+    street_address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=50)
+    default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.full_name}, {self.street_address}, {self.city}"
