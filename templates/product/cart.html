@@ -84,8 +84,15 @@
                         <p class="text-success">Discount: - ₹{{ cart.coupon.discount_price }}</p>
                     {% endif %}
                     <h4 class="fw-bold">Total: ₹{{ total }}</h4>
+
+                    <!-- Checkout Button -->
                     <a href="{% url 'checkout' %}" class="btn btn-success w-100 mt-3">Proceed to Checkout</a>
 
+                    <!-- Make Purchase Button -->
+                    <form method="POST" action="{% url 'make_purchase' %}" class="mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary w-100" id="rzp-button">Make Purchase</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -97,4 +104,38 @@
     </div>
     {% endif %}
 </div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "rzp_test_RBbwsG3RFwN4N1", 
+    "amount": "{{ payment.amount }}",
+    "currency": "INR",
+    "name": "Ecommerce",
+    "description": "Order Payment",
+    "order_id": "{{ payment.id }}", 
+
+    // ✅ Redirect to Django order-success view
+    "handler": function (response) {
+        window.location.href = "{% url 'order_success' %}?razorpay_order_id=" + response.razorpay_order_id
+            + "&razorpay_payment_id=" + response.razorpay_payment_id
+            + "&razorpay_signature=" + response.razorpay_signature;
+    },
+
+    "prefill": {
+        "name": "{{ request.user.get_full_name }}",
+        "email": "{{ request.user.email }}",
+        "contact": "+911234567890"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+document.getElementById('rzp-button').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
+
+
 {% endblock %}

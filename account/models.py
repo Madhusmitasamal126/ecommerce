@@ -21,6 +21,10 @@ class Profile(BaseModel):
 class Cart(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
+    is_paid= models.BooleanField(default=False)
+    razor_pay_order_id= models.CharField(max_length=100, null=True, blank=True)
+    razor_pay_pyment_id= models.CharField(max_length=100, null=True, blank=True)
+    razor_pay_payment_signature= models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Cart"

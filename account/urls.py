@@ -14,6 +14,7 @@ urlpatterns = [
     path("cart/add/<uuid:product_id>/", views.add_to_cart, name="add_to_cart"),
     path("cart/buy/<uuid:product_id>/", views.buy_now, name="buy_now"),
    
-
+ path("make-purchase/", views.make_purchase, name="make_purchase"),
+  path("order-success/", views.order_success, name="order_success"),
 ]
 

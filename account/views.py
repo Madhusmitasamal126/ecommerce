@@ -9,6 +9,7 @@ from account.models import Profile, Cart, CartItem
 from product.models import Coupon
 from django.views.decorators.http import require_POST
 from product.models import Product
+import razorpay
 
 @login_required
 @require_POST
@@ -117,7 +118,7 @@ def activate_account(request, token):
         messages.error(request, "Invalid or expired activation link.")
         return redirect("register")
 
-
+from django.conf import settings
 @login_required
 def cart(request):
     cart_obj, _ = Cart.objects.get_or_create(user=request.user)
@@ -127,24 +128,33 @@ def cart(request):
         if coupon_code:
             try:
                 coupon_obj = Coupon.objects.get(coupon_code__iexact=coupon_code)
-
             except Coupon.DoesNotExist:
                 messages.warning(request, 'Invalid Coupon')
                 return redirect("cart")
+
             if cart_obj.coupon:
                 messages.warning(request, 'Coupon already applied')
                 return redirect("cart")
 
             minimum_amount = getattr(coupon_obj, 'minimum_amount', 0)
             if cart_obj.get_subtotal() < float(minimum_amount):
-    # your existing code for handling minimum amount
-
                 messages.warning(request, f'Cart total must be at least ₹{coupon_obj.minimum_amount} to apply this coupon')
                 return redirect("cart")
 
             cart_obj.coupon = coupon_obj
             cart_obj.save()
-            messages.success(request, f'Coupon "{coupon_obj.name}" applied successfully!')
+            messages.success(request, f'Coupon "{coupon_obj.code}" applied successfully!')
+
+    # ✅ Create Razorpay Order
+    client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
+    payment = client.order.create({
+        'amount': int(cart_obj.get_total() * 100),
+        'currency': 'INR',
+        'payment_capture': 1
+    })
+
+    cart_obj.razor_pay_order_id = payment['id']
+    cart_obj.save()
 
     context = {
         'cart': cart_obj,
@@ -152,8 +162,36 @@ def cart(request):
         'subtotal': cart_obj.get_subtotal(),
         'discount': cart_obj.get_discount(),
         'total': cart_obj.get_total(),
+        'payment': payment,
+        'razorpay_key': settings.KEY,  # ✅ Pass key to template
     }
     return render(request, 'product/cart.html', context)
+
+
+@login_required
+def order_success(request):
+    order_id = request.GET.get('razorpay_order_id')
+    payment_id = request.GET.get('razorpay_payment_id')
+    signature = request.GET.get('razorpay_signature')
+
+    if not order_id:
+        messages.error(request, "Order ID missing. Payment may have failed.")
+        return redirect("cart")
+
+    try:
+        cart = Cart.objects.get(razor_pay_order_id=order_id, user=request.user, is_paid=False)
+    except Cart.DoesNotExist:
+        messages.error(request, "No matching order found.")
+        return redirect("cart")
+
+    # ✅ Save payment details
+    cart.is_paid = True
+    cart.razor_pay_pyment_id = payment_id
+    cart.razor_pay_payment_signature = signature
+    cart.save()
+
+    messages.success(request, "Payment successful! 🎉 Your order is confirmed.")
+    return render(request, "product/order_confirmation.html", {"cart": cart})
 
 
 @login_required
@@ -176,5 +214,12 @@ def clear_coupon(request):
         messages.success(request, "Coupon removed successfully.")
     else:
         messages.warning(request, "No coupon applied.")
+    return redirect("cart")
+
+def make_purchase(request):
+    if request.method == "POST":
+        # ⚡ Here you should place order creation, reduce stock, clear cart, etc.
+        messages.success(request, "🎉 Purchase completed successfully!")
+        return redirect("order_success")
     return redirect("cart")
 
