@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from ecom.emails import send_account_activation_email
 
-
+# ---------------- PROFILE ----------------
 class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     is_email_verified = models.BooleanField(default=False)
@@ -17,29 +17,23 @@ class Profile(BaseModel):
     def __str__(self):
         return self.user.username
 
-
-class Cart(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
-    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
-    is_paid= models.BooleanField(default=False)
-    razor_pay_order_id= models.CharField(max_length=100, null=True, blank=True)
-    razor_pay_pyment_id= models.CharField(max_length=100, null=True, blank=True)
-    razor_pay_payment_signature= models.CharField(max_length=100, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.user.username}'s Cart"
+# ---------------- CART ----------------
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    coupon = models.ForeignKey('product.Coupon', on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def get_subtotal(self):
-        return sum([item.total_price() for item in self.items.all()])
+        return sum(item.product.price * item.quantity for item in self.items.all())
 
     def get_discount(self):
         if self.coupon:
-            return float(self.coupon.discount_price)
+            return (self.get_subtotal() * self.coupon.discount) / 100
         return 0
+
     def get_total(self):
-        return max(self.get_subtotal() - self.get_discount(), 0)
-
-
+        return self.get_subtotal() - self.get_discount()
 
 class CartItem(BaseModel):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
@@ -56,26 +50,16 @@ class CartItem(BaseModel):
     def __str__(self):
         return f"{self.quantity} x {self.product.pro_name}"
 
+# ---------------- COUPON ----------------
 class Coupon(models.Model):
     code = models.CharField(max_length=50)
-    discount = models.FloatField(default=0)   # default added
-    minimum_amount = models.FloatField(default=0) # <-- add this if missing
-    # optional: add expiry, active, etc.
-
+    discount = models.FloatField(default=0)
+    minimum_amount = models.FloatField(default=0)
 
     def __str__(self):
         return self.code
 
-
-# --- Auto create Profile and Cart ---
-@receiver(post_save, sender=User)
-def create_profile_and_cart(sender, instance, created, **kwargs):
-    if created:
-        token = str(uuid.uuid4())
-        Profile.objects.create(user=instance, email_token=token)
-        Cart.objects.create(user=instance)
-        if instance.email:
-            send_account_activation_email(instance.email, token)
+# ---------------- ADDRESS ----------------
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
@@ -89,3 +73,35 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.full_name}, {self.street_address}, {self.city}"
+
+# ---------------- PAYMENT ----------------
+class Payment(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('success', 'Success'),
+        ('failed', 'Failed'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
+    razorpay_signature = models.CharField(max_length=255, blank=True, null=True)
+    amount = models.FloatField(default=0)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Payment {self.id} - {self.user.username} - {self.status}"
+
+# ---------------- SIGNALS ----------------
+@receiver(post_save, sender=User)
+def create_profile_and_cart(sender, instance, created, **kwargs):
+    if created:
+        token = str(uuid.uuid4())
+        Profile.objects.create(user=instance, email_token=token)
+        Cart.objects.create(user=instance)
+        if instance.email:
+            send_account_activation_email(instance.email, token)

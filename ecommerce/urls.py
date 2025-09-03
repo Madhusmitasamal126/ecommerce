@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from product import views as product_views
+# from cart import views as cart_views
 
 urlpatterns = [
     path('', include('home.urls')),               # Home app
@@ -27,6 +28,9 @@ urlpatterns = [
     path('account/', include('account.urls')),    # Account app
     path('admin-panel/', admin.site.urls),        # Admin
     path('category/<slug:slug>/', product_views.category_detail, name='category_detail_root'),
+    # path('checkout/', cart_views.checkout, name='checkout'),
+    path('cart/', include('cart.urls')),
+
 ]
 
 if settings.DEBUG:

@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Category, Product, Review
-from account.models import Cart   # adjust if your Cart model lives in another app
-
+from account.models import Cart, Address  # adjust if your Cart model lives in another app
+from account.forms import AddressForm
 
 def categories_page(request):
     all_categories = Category.objects.all()
@@ -19,6 +19,37 @@ def category_detail(request, slug):
         "all_categories": all_categories
     })
 
+@login_required
+def address(request):
+    cart_obj = get_object_or_404(Cart, user=request.user)
+    user_addresses = Address.objects.filter(user=request.user)
+
+    if request.method == "POST":
+        # If user selects an existing address
+        selected_address_id = request.POST.get("selected_address")
+        if selected_address_id:
+            request.session["address_id"] = selected_address_id
+            return redirect("order_confirmation")
+
+        # If user adds a new address
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            new_addr = form.save(commit=False)
+            new_addr.user = request.user
+            if not user_addresses.exists():   # first address → default
+                new_addr.default = True
+            new_addr.save()
+            request.session["address_id"] = new_addr.id
+            return redirect("order_confirmation")
+    else:
+        form = AddressForm()
+
+    return render(request, "product/address.html", {
+        "addresses": user_addresses,
+        "cart_items": cart_obj.items.all(),
+        "total_price": cart_obj.get_total(),
+        "form": form
+    })
 
 
 @login_required

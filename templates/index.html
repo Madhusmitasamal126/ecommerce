@@ -81,35 +81,9 @@
         <a href="{% url 'category_detail' category.slug %}" class="btn btn-outline-primary btn-sm">Explore</a>
       </div>
     </div>
-  </div>
+    </div>
   {% empty %}
   <p class="text-center">No categories available.</p>
-  {% endfor %}
-</div>
-
-<!-- 🔹 Featured Products -->
-<h2 class="text-center fw-bold mb-4">Featured Products</h2>
-<div class="row g-4 mb-5">
-  {% for product in products %}
-  <div class="col-md-3 col-sm-6">
-    <div class="card shadow-sm h-100 border-0 product-card">
-      <div class="position-relative">
-        {% if product.images.first %}
-          <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.pro_name }}">
-        {% else %}
-          <img src="{% static 'img/no-image.png' %}" class="card-img-top" alt="No image">
-        {% endif %}
-        <span class="badge bg-danger position-absolute top-0 start-0 m-2">New</span>
-      </div>
-      <div class="card-body text-center">
-        <h5 class="card-title fw-semibold">{{ product.pro_name }}</h5>
-        <p class="card-text text-success fw-bold">₹{{ product.price }}</p>
-        <a href="{% url 'get_product' product.slug %}" class="btn btn-sm btn-outline-primary">View</a>
-      </div>
-    </div>
-  </div>
-  {% empty %}
-  <p class="text-center">No products available.</p>
   {% endfor %}
 </div>
 
