@@ -81,7 +81,6 @@ def address(request):
         'form': form
     })
 
-
 @login_required
 def order_confirmation(request):
     if not request.session.get('address_done'):

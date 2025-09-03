@@ -140,3 +140,9 @@ EMAIL_USE_SSL = False  # must be False if TLS is True
 
 EMAIL_HOST_USER = "madhusmitasamal930@gmail.com"
 EMAIL_HOST_PASSWORD = "bfatfvknkzgdnqog"  # Gmail App Password
+
+
+
+
+RAZORPAY_KEY_ID= 'rzp_test_RBbwsG3RFwN4N1'
+RAZORPAY_KEY_SECRET='ihFwgsSSHQTVCZl9JyZLek1m'

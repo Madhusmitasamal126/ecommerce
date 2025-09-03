@@ -38,12 +38,14 @@
                             <p><i class="bi bi-house-door-fill"></i> {{ addr.street_address }}, {{ addr.city }}, {{ addr.state }}, {{ addr.postal_code }}, {{ addr.country }}</p>
                             <p><i class="bi bi-telephone-fill"></i> {{ addr.phone }}</p>
                             <div class="d-flex justify-content-between mt-3">
-                             
                                 <form method="post" action="">
                                     {% csrf_token %}
                                     <input type="hidden" name="selected_address" value="{{ addr.id }}">
-                                    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-check-lg"></i> Confirm</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-check-lg"></i> Confirm
+                                    </button>
                                 </form>
+
                                 <form method="post" action="{% url 'delete_address' addr.id %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Remove</button>
@@ -71,6 +73,13 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- ✅ Always show payment button -->
+<div class="text-center mt-4">
+    <a href="{% url 'payment' %}" class="btn btn-success btn-lg">
+        <i class="bi bi-cash-coin"></i> Continue to Payment
+    </a>
 </div>
 
 <style>

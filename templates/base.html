@@ -52,9 +52,13 @@
   </a>
 </li>
       </ul>
+      <form class="d-flex" method="get" action="{% url 'search_results' %}">
+    <input class="form-control me-2" type="search" placeholder="Search" name="q" required>
+    <button class="btn btn-outline-light me-2" type="submit">Search</button>
+</form>
       <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search">
-        <button class="btn btn-outline-light me-2" type="submit">Search</button>
+        {% comment %} <input class="form-control me-2" type="search" placeholder="Search">
+        <button class="btn btn-outline-light me-2" type="submit">Search</button> {% endcomment %}
         <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Login</a>
         <a href="{% url 'register' %}" class="btn btn-outline-light">Register</a>
         <a href="{% url 'cart' %}" class="btn btn-warning ms-2">
