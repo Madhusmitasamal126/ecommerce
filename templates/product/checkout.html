@@ -1,76 +1,97 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container my-5">
-    <h2 class="fw-bold mb-4 text-primary text-center">Checkout: Confirm or Add Address</h2>
+    <h2 class="fw-bold mb-5 text-center text-primary">
+        <i class="bi bi-credit-card"></i> Checkout
+    </h2>
 
-    <!-- Cart Summary -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card shadow-sm border-primary">
-                <div class="card-header bg-primary text-white">
+    <div class="row g-4">
+        <!-- Left: Saved Addresses & Add Form -->
+        <div class="col-lg-8">
+            <div class="row">
+                <!-- Saved Addresses -->
+                <div class="col-md-12 mb-4">
+                    <h5 class="mb-3 text-success"><i class="bi bi-geo-alt-fill"></i> Your Saved Addresses</h5>
+                    {% if addresses %}
+                        <div class="row g-3">
+                            {% for addr in addresses %}
+                                <div class="col-md-6">
+                                    <div class="card shadow-sm border-0 address-card {% if addr.default %}border-success border-2{% endif %}">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-1"><i class="bi bi-person-fill"></i> {{ addr.full_name }}</h6>
+                                            <p class="small mb-1"><i class="bi bi-house-door"></i> {{ addr.street_address }}, {{ addr.city }}</p>
+                                            <p class="small mb-1"><i class="bi bi-map"></i> {{ addr.state }}, {{ addr.postal_code }}, {{ addr.country }}</p>
+                                            <p class="small text-muted"><i class="bi bi-telephone-fill"></i> {{ addr.phone }}</p>
+                                            <div class="d-flex justify-content-between mt-3">
+                                                <form method="post" action="">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="selected_address" value="{{ addr.id }}">
+                                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                                        <i class="bi bi-check-lg"></i> Use this
+                                                    </button>
+                                                </form>
+
+                                                <form method="post" action="{% url 'delete_address' addr.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-secondary">No saved addresses yet. Add a new one.</div>
+                    {% endif %}
+                </div>
+
+                <!-- Add / Update Address Form -->
+                <div class="col-md-12">
+                    <h5 class="mb-3 text-info"><i class="bi bi-plus-circle"></i> Add / Update Address</h5>
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="row g-3">
+                                    {{ form.as_p }}
+                                </div>
+                                <button type="submit" class="btn btn-success w-100 mt-3">
+                                    <i class="bi bi-save"></i> Save & Continue
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Cart Summary -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white fw-bold">
                     <i class="bi bi-cart"></i> Cart Summary
                 </div>
                 <div class="card-body">
-                    <ul class="list-group mb-3">
+                    <ul class="list-group list-group-flush mb-3">
                         {% for item in checkout_cart %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span><i class="bi bi-box-seam"></i> {{ item.product.pro_name }} (x{{ item.quantity }})</span>
+                                <span>{{ item.product.pro_name }} <small>(x{{ item.quantity }})</small></span>
                                 <span class="fw-bold">₹{{ item.total_price|floatformat:2 }}</span>
                             </li>
                         {% endfor %}
                     </ul>
-                    <p class="fw-bold text-end">Total: ₹{{ total_price|floatformat:2 }}</p>
+                    <h5 class="fw-bold text-end text-success">Total: ₹{{ total_price|floatformat:2 }}</h5>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <!-- Saved Addresses -->
-        <div class="col-lg-6 mb-4">
-            <h5 class="mb-3 text-success"><i class="bi bi-geo-alt-fill"></i> Your Saved Addresses</h5>
-            {% if addresses %}
-                {% for addr in addresses %}
-                    <div class="card mb-3 shadow-sm address-card">
-                        <div class="card-body">
-                            <h6 class="fw-bold">{{ addr.full_name }}</h6>
-                            <p>{{ addr.street_address }}, {{ addr.city }}, {{ addr.state }}, {{ addr.postal_code }}, {{ addr.country }}</p>
-                            <p><i class="bi bi-telephone-fill"></i> {{ addr.phone }}</p>
-                            <div class="d-flex justify-content-between mt-3">
-                                <form method="post" action="">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="selected_address" value="{{ addr.id }}">
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <i class="bi bi-check-lg"></i> Confirm
-                                    </button>
-                                </form>
-
-                                <form method="post" action="{% url 'delete_address' addr.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Remove</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-muted">No saved addresses yet. Add a new one.</p>
-            {% endif %}
-        </div>
-
-        <!-- Add / Update Address Form -->
-        <div class="col-lg-6">
-            <h5 class="mb-3 text-info"><i class="bi bi-plus-circle"></i> Add / Update Address</h5>
-            <div class="card shadow-sm border-info">
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-success w-100 mt-3">
-                            <i class="bi bi-save"></i> Save & Confirm
-                        </button>
-                    </form>
-                </div>
+            <!-- Payment Button -->
+            <div class="mt-4">
+                <a href="{% url 'payment' %}" class="btn btn-lg btn-success w-100">
+                    <i class="bi bi-cash-coin"></i> Continue to Payment
+                </a>
             </div>
         </div>
     </div>
@@ -78,11 +99,12 @@
 
 <style>
 .address-card {
-    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .address-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 </style>
 {% endblock %}

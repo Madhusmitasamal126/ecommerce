@@ -11,6 +11,3 @@ urlpatterns = [
     path('search/', views.search_results, name='search_results'),
     path("<slug:slug>/", views.get_product, name="get_product"),   # keep LAST
 ]
-
-
-

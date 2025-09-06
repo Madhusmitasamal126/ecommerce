@@ -2,25 +2,34 @@
 
 {% block content %}
 <div class="container my-5">
+
+    <!-- ✅ Checkout Progress Bar -->
+    <div class="checkout-steps d-flex justify-content-between mb-5">
+        <div class="step completed"><i class="bi bi-cart-check"></i> Cart</div>
+        <div class="step active"><i class="bi bi-geo-alt"></i> Address</div>
+        <div class="step"><i class="bi bi-credit-card"></i> Payment</div>
+        <div class="step"><i class="bi bi-check-circle"></i> Success</div>
+    </div>
+
     <h2 class="fw-bold mb-4 text-primary text-center">Checkout: Confirm or Add Address</h2>
 
     <!-- Cart Summary -->
     <div class="row mb-5">
         <div class="col-12">
-            <div class="card shadow-sm border-primary">
-                <div class="card-header bg-primary text-white">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-gradient bg-primary text-white fw-bold rounded-top-4">
                     <i class="bi bi-cart"></i> Cart Summary
                 </div>
                 <div class="card-body">
-                    <ul class="list-group mb-3">
+                    <ul class="list-group list-group-flush mb-3">
                         {% for item in checkout_cart %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span><i class="bi bi-box-seam"></i> {{ item.product.pro_name }} (x{{ item.quantity }})</span>
-                                <span class="fw-bold">₹{{ item.total_price|floatformat:2 }}</span>
+                                <span><i class="bi bi-box"></i> {{ item.product.pro_name }} (x{{ item.quantity }})</span>
+                                <span class="fw-bold text-success">₹{{ item.total_price|floatformat:2 }}</span>
                             </li>
                         {% endfor %}
                     </ul>
-                    <p class="fw-bold text-end">Total: ₹{{ total_price|floatformat:2 }}</p>
+                    <p class="fw-bold text-end fs-5">Total: <span class="text-primary">₹{{ total_price|floatformat:2 }}</span></p>
                 </div>
             </div>
         </div>
@@ -32,23 +41,27 @@
             <h5 class="mb-3 text-success"><i class="bi bi-geo-alt-fill"></i> Your Saved Addresses</h5>
             {% if addresses %}
                 {% for addr in addresses %}
-                    <div class="card mb-3 shadow-sm address-card {% if addr.default %}border-success bg-light{% endif %}">
+                    <div class="card mb-3 shadow-sm border-0 rounded-4 address-card {% if addr.default %}border-success bg-light{% endif %}">
                         <div class="card-body">
-                            <h6 class="fw-bold">{{ addr.full_name }}</h6>
-                            <p><i class="bi bi-house-door-fill"></i> {{ addr.street_address }}, {{ addr.city }}, {{ addr.state }}, {{ addr.postal_code }}, {{ addr.country }}</p>
+                            <h6 class="fw-bold text-primary"><i class="bi bi-person-badge"></i> {{ addr.full_name }}</h6>
+                            <p class="mb-1"><i class="bi bi-house-door-fill"></i> {{ addr.street_address }}, {{ addr.city }}</p>
+                            <p class="mb-1"><i class="bi bi-map"></i> {{ addr.state }}, {{ addr.postal_code }}, {{ addr.country }}</p>
                             <p><i class="bi bi-telephone-fill"></i> {{ addr.phone }}</p>
+
                             <div class="d-flex justify-content-between mt-3">
                                 <form method="post" action="">
                                     {% csrf_token %}
                                     <input type="hidden" name="selected_address" value="{{ addr.id }}">
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <i class="bi bi-check-lg"></i> Confirm
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
+                                        <i class="bi bi-check-lg"></i> Use this
                                     </button>
                                 </form>
 
                                 <form method="post" action="{% url 'delete_address' addr.id %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Remove</button>
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -62,33 +75,67 @@
         <!-- Add / Update Address Form -->
         <div class="col-lg-6">
             <h5 class="mb-3 text-info"><i class="bi bi-plus-circle"></i> Add / Update Address</h5>
-            <div class="card shadow-sm border-info">
+            <div class="card shadow border-0 rounded-4">
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <button type="submit" class="btn btn-success w-100 mt-3"><i class="bi bi-save"></i> Save & Confirm</button>
+                        <button type="submit" class="btn btn-success w-100 mt-3 rounded-pill">
+                            <i class="bi bi-save"></i> Save & Confirm
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- ✅ Always show payment button -->
-<div class="text-center mt-4">
-    <a href="{% url 'payment' %}" class="btn btn-success btn-lg">
-        <i class="bi bi-cash-coin"></i> Continue to Payment
-    </a>
+    <!-- Payment Button -->
+    <div class="text-center mt-5">
+        <a href="{% url 'payment' %}" class="btn btn-lg btn-gradient rounded-pill px-5 py-2">
+            <i class="bi bi-cash-coin"></i> Continue to Payment
+        </a>
+    </div>
 </div>
 
 <style>
-.address-card {
-    transition: transform 0.3s, box-shadow 0.3s;
+/* Checkout steps */
+.checkout-steps .step {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    color: #999;
+    position: relative;
 }
+.checkout-steps .step.active { color: #0d6efd; }
+.checkout-steps .step.completed { color: #198754; }
+.checkout-steps .step::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -50%;
+    width: 100%;
+    height: 3px;
+    background: #ccc;
+    z-index: -1;
+}
+.checkout-steps .step:last-child::after { display: none; }
+.checkout-steps .step.completed::after { background: #198754; }
+
+/* Address card hover */
+.address-card { transition: transform 0.3s, box-shadow 0.3s; }
 .address-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0,0,0,0.1);
+}
+
+/* Gradient button */
+.btn-gradient {
+    background: linear-gradient(90deg, #28a745, #20c997);
+    color: #fff;
+    border: none;
+}
+.btn-gradient:hover {
+    background: linear-gradient(90deg, #218838, #17a2b8);
 }
 </style>
 {% endblock %}

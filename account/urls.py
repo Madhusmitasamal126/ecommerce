@@ -9,7 +9,8 @@ urlpatterns = [
 
     # Product
     
-    path("product/<slug:slug>/", views.get_product, name="get_product"),
+    path('product/<slug:slug>/', views.product_detail, name='product_detail'),
+    path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
 
 
     # Cart
@@ -17,6 +18,8 @@ urlpatterns = [
     path('cart/remove/<uuid:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path("cart/add/<uuid:product_id>/", views.add_to_cart, name='add_to_cart'),
     path("cart/buy/<uuid:product_id>/", views.buy_now, name='buy_now'),
+    path('cash-on-delivery/', views.cash_on_delivery, name='cash_on_delivery'),
+    path('order/confirm/', views.order_confirm, name='order_confirm'),
 
     # Coupon
     path("apply-coupon/", views.apply_coupon, name="apply_coupon"),
@@ -30,5 +33,6 @@ urlpatterns = [
 
     # Orders
     path('order/confirmation/', views.order_confirmation, name='order_confirmation'),
-    path("order/tracking/", views.order_tracking, name="order_tracking"),
+    # path('order/track/<int:order_id>/', views.track_order, name='track_order'),
+
 ]

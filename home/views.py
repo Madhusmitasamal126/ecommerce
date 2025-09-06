@@ -1,10 +1,6 @@
 from django.shortcuts import render
 from product.models import Product,Category
 
-
-
-
-
 # Create your views here.
 def index(request):
     categories = Category.objects.all()

@@ -5,48 +5,95 @@
 
 {% block content %}
 <div class="container my-5">
-    <h2 class="fw-bold mb-4 text-primary"><i class="bi bi-truck"></i> Your Orders</h2>
+    <h2 class="fw-bold mb-4 text-primary text-center">
+        <i class="bi bi-bag-check"></i> My Orders
+    </h2>
 
     {% if orders %}
-        <div class="row">
+        <div class="accordion" id="ordersAccordion">
             {% for order in orders %}
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm border-info">
-                        <div class="card-header bg-info text-white d-flex justify-content-between">
-                            <span>Order #{{ order.id }}</span>
-                            <span>{{ order.created_at|date:"M d, Y H:i" }}</span>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="fw-bold">Items:</h6>
-                            <ul class="list-group mb-2">
+                <div class="accordion-item shadow-sm mb-3 rounded-3 border">
+                    <h2 class="accordion-header" id="heading{{ order.id }}">
+                        <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ order.id }}" aria-expanded="false" aria-controls="collapse{{ order.id }}">
+                            Order #{{ order.id }} • {{ order.created_at|date:"M d, Y H:i" }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ order.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ order.id }}" data-bs-parent="#ordersAccordion">
+                        <div class="accordion-body">
+                            <!-- Items -->
+                            <h6 class="fw-bold"><i class="bi bi-box-seam"></i> Items</h6>
+                            <ul class="list-group mb-3">
                                 {% for item in order.items.all %}
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        {{ item.product.pro_name }} (x{{ item.quantity }})
-                                        <span>₹{{ item.total_price|floatformat:2 }}</span>
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product.images.first %}
+                                                <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.pro_name }}" class="me-2 rounded" style="width:50px; height:50px; object-fit:cover;">
+                                            {% else %}
+                                                <img src="{% static 'img/no-image.png' %}" alt="No image" class="me-2 rounded" style="width:50px; height:50px; object-fit:cover;">
+                                            {% endif %}
+                                            {{ item.product.pro_name }} (x{{ item.quantity }})
+                                        </div>
+                                        <span class="fw-bold">₹{{ item.total_price|floatformat:2 }}</span>
                                     </li>
                                 {% endfor %}
                             </ul>
-                            <p class="fw-bold mb-1">Total: ₹{{ order.total_price|floatformat:2 }}</p>
-                            <p class="mb-1"><strong>Status:</strong> {{ order.status }}</p>
-                            <p class="mb-0"><strong>Delivery Address:</strong> {{ order.address.street_address }}, {{ order.address.city }}, {{ order.address.state }}, {{ order.address.postal_code }}, {{ order.address.country }}</p>
+
+                            <!-- Summary -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold">Total:</span>
+                                <span class="text-success fw-bold fs-5">₹{{ order.total_price|floatformat:2 }}</span>
+                            </div>
+
+                            <!-- Status -->
+                            <p class="mb-2">
+                                <strong>Status:</strong> 
+                                {% if order.status == "Pending" %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Pending</span>
+                                {% elif order.status == "Shipped" %}
+                                    <span class="badge bg-info text-dark"><i class="bi bi-truck"></i> Shipped</span>
+                                {% elif order.status == "Delivered" %}
+                                    <span class="badge bg-success"><i class="bi bi-check2-circle"></i> Delivered</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Processing</span>
+                                {% endif %}
+                            </p>
+
+                            <!-- Address -->
+                            <p class="mb-0"><strong>Delivery Address:</strong><br>
+                                {{ order.address.full_name }}, {{ order.address.street_address }}, 
+                                {{ order.address.city }}, {{ order.address.state }} - {{ order.address.postal_code }},
+                                {{ order.address.country }}
+                            </p>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <p class="text-muted">You have not placed any orders yet.</p>
-        <a href="{% url 'index' %}" class="btn btn-primary mt-3"><i class="bi bi-house-door"></i> Start Shopping</a>
+        <div class="text-center">
+            <p class="text-muted">You haven’t placed any orders yet.</p>
+            <a href="{% url 'index' %}" class="btn btn-primary mt-3">
+                <i class="bi bi-house-door"></i> Start Shopping
+            </a>
+        </div>
     {% endif %}
 </div>
 
 <style>
-.card:hover {
-    transform: scale(1.02);
-    transition: 0.3s;
+.accordion-button:not(.collapsed) {
+    background-color: #e9f5ff;
+    color: #0d6efd;
 }
-.card-header {
-    font-weight: bold;
+.accordion-item {
+    border-radius: 10px !important;
+    overflow: hidden;
+}
+.list-group-item {
+    border: none;
+    border-bottom: 1px solid #eee;
+}
+.list-group-item:last-child {
+    border-bottom: none;
 }
 </style>
 {% endblock %}
