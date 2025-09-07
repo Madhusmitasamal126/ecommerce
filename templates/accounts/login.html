@@ -3,34 +3,98 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-  
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <title>Login - MyShop</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
-        #login-page div{
-            font-size: 20px;
-            font-weight:italic;
-            color: black;
-            background-image: url("/static/img/na.jpg");
-            background-repeat: no-repeat;
-            background-size:cover;
-            color:red;
+        body {
+            background: linear-gradient(135deg, #f0f4ff, #d9e7ff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        .login-card {
+            max-width: 400px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 20px;
+            background-color: #ffffffcc;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at top left, #0d6efd55, transparent 70%);
+            top: -50%;
+            left: -50%;
+            transform: rotate(30deg);
+        }
+
+        .login-card h2 {
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(45deg, #0d6efd, #6610f2);
+            color: white;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        .social-login i {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+
+        .links a {
+            text-decoration: none;
+        }
+
     </style>
 </head>
-<body class="container align-top" id="login-page">
-    <div class="text-center border border-secondary bg-danger-subtle p-4 mt-5 w-50 mx-auto rounded-5">
-    <h2 class="text-center">Login</h2>
-    <form method="POST" class="text-center">
-        {% csrf_token %}
-        <label>Username:</label>
-        <input type="text" name="username"><br><br>
+<body>
+    <div class="login-card text-center">
+        <h2 class="mb-4 fw-bold">Login</h2>
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="mb-3 text-start">
+                <label for="username" class="form-label"><i class="bi bi-person-fill me-1"></i> Username</label>
+                <input type="text" name="username" id="username" class="form-control rounded-pill" placeholder="Enter your username" required>
+            </div>
+            <div class="mb-3 text-start">
+                <label for="password" class="form-label"><i class="bi bi-lock-fill me-1"></i> Password</label>
+                <input type="password" name="password" id="password" class="form-control rounded-pill" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-gradient w-100 rounded-pill mb-3">Login</button>
+        </form>
 
-        <label>Password:</label>
-        <input type="password" name="password"><br><br>
+        <div class="links mb-3">
+            <a href="{% url 'password_reset' %}" class="text-primary me-3">Forgot Password?</a>
+            <a href="{% url 'register' %}" class="text-success">Register</a>
+        </div>
 
-        <button type="submit" class="rounded-pill bg-success text-white p-2 m-2">Login</button>
-    </form>
-</div>
+        <p class="text-muted">Or login with</p>
+        <div class="d-flex justify-content-center gap-3 social-login">
+            <button class="btn btn-outline-primary rounded-pill"><i class="bi bi-facebook"></i> Facebook</button>
+            <button class="btn btn-outline-danger rounded-pill"><i class="bi bi-google"></i> Google</button>
+        </div>
+    </div>
 </body>
 </html>

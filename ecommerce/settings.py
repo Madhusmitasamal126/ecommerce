@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ecom',
-    'product.apps.ProductConfig',
-   'account.apps.AccountConfig',
+    'product',
+   'account',
    'home',
     'cart',
 ]
@@ -146,3 +146,9 @@ EMAIL_HOST_PASSWORD = "bfatfvknkzgdnqog"  # Gmail App Password
 
 RAZORPAY_KEY_ID= 'rzp_test_RBbwsG3RFwN4N1'
 RAZORPAY_KEY_SECRET='ihFwgsSSHQTVCZl9JyZLek1m'
+
+
+# # settings.py
+# LOGIN_URL = '/accounts/login/'
+#        # Redirect here when login is required
+# LOGIN_REDIRECT_URL = '/'         # Redirect here after successful login

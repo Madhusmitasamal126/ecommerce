@@ -1,12 +1,13 @@
 from django.urls import path
 from account import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     # Auth
     path('login/', views.login_page, name='login'),
     path('register/', views.register_page, name='register'),
     path('activate/<str:token>/', views.activate_account, name='activate'),
-
+    # path('', views.index, name='index'), 
     # Product
     
     path('product/<slug:slug>/', views.product_detail, name='product_detail'),
@@ -27,12 +28,33 @@ urlpatterns = [
 
     # Checkout flow
     path('checkout/', views.checkout, name='checkout'),   # Cart summary only
-    # path("address/", views.address_page, name="address_page"),     # Address step
+    path("address/", views.address_page, name="address_page"),     # Address step
     path("payment/", views.payment, name="payment"),      # Payment step
     path("payment-success/", views.payment_success, name="payment_success"),
 
     # Orders
-    path('order/confirmation/', views.order_confirmation, name='order_confirmation'),
-    # path('order/track/<int:order_id>/', views.track_order, name='track_order'),
+   path("account/order/confirm/", views.order_confirm, name="order_confirm"),
+    path("account/order/track/<int:order_id>/", views.track_order, name="track_order"),
+
+
+
+      # Forgot Password
+    path('password-reset/', auth_views.PasswordResetView.as_view(
+        template_name='accounts/password_reset.html'
+    ), name='password_reset'),
+
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(
+        template_name='accounts/password_reset_done.html'
+    ), name='password_reset_done'),
+
+   path('password-reset-confirm/<uidb64>/<token>/', 
+     auth_views.PasswordResetConfirmView.as_view(
+         template_name='accounts/password_reset_confirm.html'
+     ), name='password_reset_confirm'),
+
+
+    path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(
+        template_name='accounts/password_reset_complete.html'
+    ), name='password_reset_complete'),
 
 ]

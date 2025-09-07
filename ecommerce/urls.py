@@ -25,7 +25,8 @@ from product import views as product_views
 urlpatterns = [
     path('', include('home.urls')),               # Home app
     path('product/', include('product.urls')),    # Product app
-    path('account/', include('account.urls')),    # Account app
+    path('account/', include('account.urls')),
+   # Account app
     path('admin-panel/', admin.site.urls),        # Admin
     path('category/<slug:slug>/', product_views.category_detail, name='category_detail_root'),
     # path('checkout/', cart_views.checkout, name='checkout'),

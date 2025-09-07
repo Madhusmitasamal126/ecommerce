@@ -109,24 +109,28 @@ def create_profile_and_cart(sender, instance, created, **kwargs):
         if instance.email:
             send_account_activation_email(instance.email, token)
 
-# class Order(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-#     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
-#     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
-#     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-#     status = models.CharField(
-#         max_length=20,
-#         choices=(
-#             ("Processing", "Processing"),
-#             ("Shipped", "Shipped"),
-#             ("Out for Delivery", "Out for Delivery"),
-#             ("Delivered", "Delivered"),
-#         ),
-#          default="Processing"
-#     )
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     estimated_delivery = models.CharField(max_length=50, default="3-5 business days")
+class Order(models.Model):
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='orders'   # <-- add this
+    )
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(
+        max_length=20,
+        choices=(
+            ("Processing", "Processing"),
+            ("Shipped", "Shipped"),
+            ("Out for Delivery", "Out for Delivery"),
+            ("Delivered", "Delivered"),
+        ),
+        default="Processing"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    estimated_delivery = models.CharField(max_length=50, default="3-5 business days")
 
-#     def __str__(self):
-#         return f"Order #{self.id} by {self.user.username}"
+    def __str__(self):
+        return f"Order #{self.id} by {self.user.username}"

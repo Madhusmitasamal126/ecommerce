@@ -7,12 +7,12 @@
 <div class="container mt-4">
   <div class="row">
     <!-- Categories Sidebar -->
-    <div class="col-md-3">
-      <h5 class="fw-bold">Categories</h5>
-      <ul class="list-group">
+    <div class="col-md-3 mb-4">
+      <h5 class="fw-bold mb-3">Categories</h5>
+      <ul class="list-group shadow-sm rounded">
         {% for cat in all_categories %}
           <li class="list-group-item {% if cat.id == category.id %}active{% endif %}">
-            <a href="{% url 'category_detail' cat.slug %}" class="{% if cat.id == category.id %}text-white{% endif %}">
+            <a href="{% url 'category_detail' cat.slug %}" class="{% if cat.id == category.id %}text-white fw-bold{% else %}text-dark{% endif %}">
               {{ cat.cat_name }}
             </a>
           </li>
@@ -22,35 +22,81 @@
 
     <!-- Products Grid -->
     <div class="col-md-9">
-      <h2 class="fw-bold">{{ category.cat_name }}</h2>
-      <div class="row mt-3">
+      <h2 class="fw-bold mb-3">{{ category.cat_name }}</h2>
+      <div class="row g-4">
         {% for product in products %}
-          <div class="col-md-3 mb-4">
-            <div class="card shadow-sm h-100">
-              {% if product.images.first %}
-                <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.pro_name }}">
-              {% else %}
-                <img src="{% static 'img/no-image.png' %}" class="card-img-top" alt="No image">
-              {% endif %}
-              <div class="card-body">
-                <h5 class="card-title">{{ product.pro_name }}</h5>
-                <p class="text-success fw-bold">₹{{ product.price }}</p>
-               <a href="{% url 'get_product' product.slug %}" class="btn btn-primary btn-sm">View</a>
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="card product-card shadow-sm h-100 border-0 rounded-4 overflow-hidden position-relative">
 
-               <form action="{% url 'add_to_cart' product.id %}" method="post" style="display:inline;">
-                {% csrf_token %}
-               <button type="submit" class="btn btn-warning btn-sm">Add to Cart</button>
-                </form>
+              <!-- Product Image -->
+              <div class="position-relative overflow-hidden">
+                {% if product.images.first %}
+                  <img src="{{ product.images.first.image.url }}" class="card-img-top product-img" alt="{{ product.pro_name }}">
+                {% else %}
+                  <img src="{% static 'img/no-image.png' %}" class="card-img-top product-img" alt="No image">
+                {% endif %}
 
+                <!-- Badge -->
+                {% if product.is_new %}
+                  <span class="badge bg-success position-absolute top-0 start-0 m-2 px-2 py-1 rounded-pill">New</span>
+                {% elif product.discount %}
+                  <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-2 py-1 rounded-pill">Sale {{ product.discount }}%</span>
+                {% endif %}
+              </div>
+
+              <!-- Product Info -->
+              <div class="card-body text-center d-flex flex-column">
+                <h6 class="card-title text-truncate mb-1" title="{{ product.pro_name }}">{{ product.pro_name }}</h6>
+                <p class="text-success fw-bold mb-2">₹{{ product.price }}</p>
+
+                <div class="mt-auto d-flex justify-content-center gap-2">
+                  <a href="{% url 'get_product' product.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                    <i class="bi bi-eye"></i> View
+                  </a>
+                  <form method="post" action="{% url 'add_to_cart' product.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">
+                      <i class="bi bi-cart"></i> Add
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
         {% empty %}
-          <p>No products found in this category.</p>
+          <div class="col-12 text-center py-5">
+            <img src="{% static 'img/empty-search.png' %}" width="150" class="mb-3" alt="No Products">
+            <h5 class="fw-bold">No products found in this category</h5>
+            <p class="text-muted">Try exploring other categories.</p>
+            <a href="/" class="btn btn-primary rounded-pill px-4">Go Back Home</a>
+          </div>
         {% endfor %}
       </div>
     </div>
   </div>
 </div>
 
+<!-- Custom Styles -->
+<style>
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+.product-img {
+  transition: transform 0.3s ease;
+}
+.product-card:hover .product-img {
+  transform: scale(1.05);
+}
+.card-title {
+  font-size: 0.95rem;
+  min-height: 42px;
+}
+.badge {
+  font-size: 0.75rem;
+}
+</style>
 {% endblock %}

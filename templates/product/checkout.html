@@ -1,110 +1,47 @@
+<!-- templates/product/checkout.html -->
 {% extends "base.html" %}
 {% block content %}
 <div class="container my-5">
-    <h2 class="fw-bold mb-5 text-center text-primary">
-        <i class="bi bi-credit-card"></i> Checkout
-    </h2>
+    <h2 class="fw-bold text-center text-primary mb-4">Checkout</h2>
 
     <div class="row g-4">
-        <!-- Left: Saved Addresses & Add Form -->
-        <div class="col-lg-8">
-            <div class="row">
-                <!-- Saved Addresses -->
-                <div class="col-md-12 mb-4">
-                    <h5 class="mb-3 text-success"><i class="bi bi-geo-alt-fill"></i> Your Saved Addresses</h5>
-                    {% if addresses %}
-                        <div class="row g-3">
-                            {% for addr in addresses %}
-                                <div class="col-md-6">
-                                    <div class="card shadow-sm border-0 address-card {% if addr.default %}border-success border-2{% endif %}">
-                                        <div class="card-body">
-                                            <h6 class="fw-bold mb-1"><i class="bi bi-person-fill"></i> {{ addr.full_name }}</h6>
-                                            <p class="small mb-1"><i class="bi bi-house-door"></i> {{ addr.street_address }}, {{ addr.city }}</p>
-                                            <p class="small mb-1"><i class="bi bi-map"></i> {{ addr.state }}, {{ addr.postal_code }}, {{ addr.country }}</p>
-                                            <p class="small text-muted"><i class="bi bi-telephone-fill"></i> {{ addr.phone }}</p>
-                                            <div class="d-flex justify-content-between mt-3">
-                                                <form method="post" action="">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="selected_address" value="{{ addr.id }}">
-                                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                                        <i class="bi bi-check-lg"></i> Use this
-                                                    </button>
-                                                </form>
-
-                                                <form method="post" action="{% url 'delete_address' addr.id %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
+        <!-- Left: Selected Address -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">Shipping Address</div>
+                <div class="card-body">
+                    {% if address %}
+                        <h5>{{ address.full_name }}</h5>
+                        <p>{{ address.street_address }}, {{ address.city }}, {{ address.state }} - {{ address.postal_code }}</p>
+                        <p>{{ address.country }}</p>
+                        <p>Phone: {{ address.phone }}</p>
+                        <a href="{% url 'address_page' %}" class="btn btn-outline-primary btn-sm mt-2">Change Address</a>
                     {% else %}
-                        <div class="alert alert-secondary">No saved addresses yet. Add a new one.</div>
+                        <p>No address selected.</p>
+                        <a href="{% url 'address_page' %}" class="btn btn-primary btn-sm">Add Address</a>
                     {% endif %}
-                </div>
-
-                <!-- Add / Update Address Form -->
-                <div class="col-md-12">
-                    <h5 class="mb-3 text-info"><i class="bi bi-plus-circle"></i> Add / Update Address</h5>
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <form method="post">
-                                {% csrf_token %}
-                                <div class="row g-3">
-                                    {{ form.as_p }}
-                                </div>
-                                <button type="submit" class="btn btn-success w-100 mt-3">
-                                    <i class="bi bi-save"></i> Save & Continue
-                                </button>
-                            </form>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Right: Cart Summary -->
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white fw-bold">
-                    <i class="bi bi-cart"></i> Cart Summary
-                </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">Order Summary</div>
                 <div class="card-body">
-                    <ul class="list-group list-group-flush mb-3">
+                    <ul class="list-group mb-3">
                         {% for item in checkout_cart %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>{{ item.product.pro_name }} <small>(x{{ item.quantity }})</small></span>
-                                <span class="fw-bold">₹{{ item.total_price|floatformat:2 }}</span>
+                            <li class="list-group-item d-flex justify-content-between">
+                                {{ item.product.pro_name }} (x{{ item.quantity }})
+                                <span>₹{{ item.product.price|floatformat:2|add:item.quantity|floatformat:2 }}</span>
                             </li>
                         {% endfor %}
                     </ul>
-                    <h5 class="fw-bold text-end text-success">Total: ₹{{ total_price|floatformat:2 }}</h5>
+                    <h5 class="text-end">Total: ₹{{ total_price }}</h5>
+                    <a href="{% url 'payment' %}" class="btn btn-success w-100 mt-3">Continue to Payment</a>
                 </div>
-            </div>
-
-            <!-- Payment Button -->
-            <div class="mt-4">
-                <a href="{% url 'payment' %}" class="btn btn-lg btn-success w-100">
-                    <i class="bi bi-cash-coin"></i> Continue to Payment
-                </a>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-.address-card {
-    border-radius: 12px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.address-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-</style>
 {% endblock %}
