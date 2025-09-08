@@ -8,25 +8,23 @@
 <!-- 🔹 Hero Carousel -->
 <div id="heroCarousel" class="carousel slide mb-5 shadow-lg rounded" data-bs-ride="carousel">
   <div class="carousel-inner rounded overflow-hidden">
-    {% comment %} Repeat carousel items dynamically if needed {% endcomment %}
     <div class="carousel-item active">
       <img src="{% static 'img/banner1.jpg' %}" class="d-block w-100" alt="Banner 1">
-      <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
-        <h2 class="fw-bold animate__animated animate__fadeInDown">New Season Arrivals</h2>
-        <p class="animate__animated animate__fadeInUp">Check out all the new trends</p>
-        <a href="#" class="btn btn-primary btn-lg shadow">Shop Now</a>
+      <div class="carousel-caption d-none d-md-block rounded p-3 animate__animated animate__fadeIn">
+        <h2 class="fw-bold animate__fadeInDown">New Season Arrivals</h2>
+        <p class="animate__fadeInUp">Check out all the new trends</p>
+        <a href="#" class="btn btn-gradient btn-lg shadow">Shop Now</a>
       </div>
     </div>
     <div class="carousel-item">
       <img src="{% static 'img/banner2.jpg' %}" class="d-block w-100" alt="Banner 2">
-      <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
-        <h2 class="fw-bold animate__animated animate__fadeInDown">Exclusive Discounts</h2>
-        <p class="animate__animated animate__fadeInUp">Grab your favorite items at lowest prices</p>
+      <div class="carousel-caption d-none d-md-block rounded p-3 animate__animated animate__fadeIn">
+        <h2 class="fw-bold animate__fadeInDown">Exclusive Discounts</h2>
+        <p class="animate__fadeInUp">Grab your favorite items at lowest prices</p>
         <a href="#" class="btn btn-warning btn-lg shadow">Explore Deals</a>
       </div>
     </div>
   </div>
-
   <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
     <span class="carousel-control-prev-icon bg-dark rounded-circle p-3"></span>
   </button>
@@ -52,12 +50,10 @@
       </div>
     </div>
   </div>
-  {% empty %}
-    <p class="text-center">No categories available.</p>
   {% endfor %}
 </div>
 
-<!-- 🔹 Featured Products Section -->
+<!-- 🔹 Featured Products -->
 <div class="mb-5">
   <h2 class="text-center fw-bold mb-4">🔥 Featured Products</h2>
   <div class="row g-4">
@@ -76,87 +72,132 @@
   </div>
 </div>
 
-<!-- 🔹 CTA Banner -->
-<div class="p-5 text-center rounded shadow-lg position-relative overflow-hidden mb-5" 
-     style="background: linear-gradient(135deg, #0d6efd, #6610f2); color:white;">
-  
-  <!-- Animated background shapes -->
-  <div class="position-absolute top-0 start-0 w-100 h-100" 
-       style="background: url('https://www.transparenttextures.com/patterns/connected.png'); 
-              opacity: 0.15;">
-  </div>
-
-  <!-- Content -->
-  <div class="position-relative">
-    <h3 class="fw-bold display-6 mb-3 animate__animated animate__fadeInDown">
-      🎉 Don’t Miss Out on Exclusive Offers!
-    </h3>
-    <p class="lead mb-4 animate__animated animate__fadeInUp">
-      Sign up now and get the latest deals straight to your inbox.
-    </p>
-    <a href="#" class="btn btn-warning btn-lg px-5 fw-semibold shadow-lg rounded-pill animate__animated animate__pulse animate__infinite">
-      Join Now
-    </a>
-  </div>
-</div>
-
-<!-- 🔹 Newsletter Signup -->
-<div class="p-5 bg-light rounded shadow-sm text-center mb-5">
-  <h4 class="fw-bold mb-3">Subscribe to Our Newsletter</h4>
-  <p class="text-muted mb-4">Get latest updates and special offers.</p>
-  <form class="row g-2 justify-content-center">
-    <div class="col-md-4 col-sm-6">
-      <input type="email" class="form-control rounded-pill" placeholder="Enter your email">
-    </div>
-    <div class="col-auto">
-      <button type="submit" class="btn btn-primary rounded-pill px-4">Subscribe</button>
-    </div>
-  </form>
-</div>
-
-<!-- 🔹 Testimonials Section -->
+<!-- 🔹 Testimonials -->
 <div class="mb-5">
   <h2 class="text-center fw-bold mb-4">What Our Customers Say</h2>
   <div class="row g-4 justify-content-center">
     {% for testimonial in testimonials %}
     <div class="col-md-4">
-      <div class="card border-0 shadow-sm rounded-4 p-4 text-center hover-scale">
+      <div class="card border-0 shadow-lg rounded-4 p-4 text-center hover-scale bg-light">
         <p class="fst-italic">"{{ testimonial.message }}"</p>
-        <h6 class="fw-bold mt-3">{{ testimonial.name }}</h6>
+        <h6 class="fw-bold mt-3 text-primary">— {{ testimonial.name }}</h6>
       </div>
     </div>
     {% endfor %}
   </div>
 </div>
 
+<!-- 🔹 Contact Section -->
+<section class="contact-section py-5 position-relative">
+  <div class="container">
+    <h2 class="fw-bold text-center text-white mb-5">📞 Contact Us</h2>
+    <div class="row g-5">
+      <!-- Contact Form -->
+      <div class="col-md-6">
+        <div class="card shadow-lg border-0 rounded-4 p-4 h-100">
+          <h4 class="fw-bold mb-4 text-primary">Get in Touch</h4>
+          <form method="post" action="">
+            {% csrf_token %}
+            <div class="form-floating mb-3">
+              <input type="text" name="name" class="form-control rounded-3" placeholder="Your Name" required>
+              <label>Name</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="email" name="email" class="form-control rounded-3" placeholder="Your Email" required>
+              <label>Email</label>
+            </div>
+            <div class="form-floating mb-3">
+              <textarea name="message" class="form-control rounded-3" placeholder="Your Message" style="height: 120px" required></textarea>
+              <label>Message</label>
+            </div>
+            <button type="submit" class="btn btn-gradient px-5 rounded-pill shadow-sm">Send Message</button>
+          </form>
+        </div>
+      </div>
+      <!-- Contact Info -->
+      <div class="col-md-6">
+        <div class="card shadow-lg border-0 rounded-4 p-4 h-100 bg-light">
+          <h4 class="fw-bold mb-4 text-primary">Contact Information</h4>
+          <ul class="list-unstyled fs-6 mb-4">
+            <li class="mb-3 d-flex align-items-center">
+              <span class="icon-circle me-3"><i class="bi bi-envelope-fill"></i></span>
+              <span><strong>Email:</strong> madhusmitasamal930@gmail.com</span>
+            </li>
+            <li class="mb-3 d-flex align-items-center">
+              <span class="icon-circle me-3"><i class="bi bi-telephone-fill"></i></span>
+              <span><strong>Phone:</strong> +91 6371370126</span>
+            </li>
+            <li class="mb-3 d-flex align-items-center">
+              <span class="icon-circle me-3"><i class="bi bi-geo-alt-fill"></i></span>
+              <span><strong>Address:</strong> 6 and 7, Subhadra PG, 2nd cross, Marathahalli, Bangalore</span>
+            </li>
+          </ul>
+          <div class="rounded overflow-hidden shadow-sm">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18..."
+              width="100%" height="250" style="border:0;" allowfullscreen loading="lazy"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <style>
-/* Hover zoom effect for cards */
+/* 🔹 Gradient Buttons */
+.btn-gradient {
+  background: linear-gradient(135deg, #0d6efd, #6610f2);
+  color: #fff;
+  border: none;
+}
+.btn-gradient:hover {
+  background: linear-gradient(135deg, #6610f2, #0d6efd);
+  color: #fff;
+}
+
+/* 🔹 Contact Section Background */
+.contact-section {
+  background: linear-gradient(135deg, #0d6efd, #6610f2);
+  color: white;
+  position: relative;
+}
+.contact-section::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  left: -50px;
+  width: 150px;
+  height: 150px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+}
+.contact-section::after {
+  content: "";
+  position: absolute;
+  bottom: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+}
+
+/* 🔹 Icon Circles */
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  background: #0d6efd;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-size: 1.2rem;
+}
+
+/* Hover zoom effect */
 .hover-scale:hover {
-    transform: scale(1.05);
-    transition: 0.3s;
-}
-
-/* Smooth shadow on hover */
-.product-card:hover, .category-card:hover {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-/* Carousel captions rounded background */
-.carousel-caption {
-    background: rgba(0,0,0,0.5);
-    padding: 1rem 1.5rem;
-    border-radius: 0.5rem;
-}
-
-/* Newsletter input */
-input.form-control {
-    padding: 0.75rem 1rem;
-}
-
-/* Responsive spacing tweaks */
-@media (max-width: 768px) {
-    .carousel-caption h2 { font-size: 1.5rem; }
-    .carousel-caption p { font-size: 1rem; }
+  transform: scale(1.05);
+  transition: 0.3s;
 }
 </style>
 
