@@ -6,6 +6,8 @@ import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from ecom.emails import send_account_activation_email
+from django.utils import timezone
+
 
 # ---------------- PROFILE ----------------
 class Profile(BaseModel):
@@ -41,6 +43,7 @@ class CartItem(BaseModel):
     quantity = models.PositiveIntegerField(default=1)
     selected_size = models.CharField(max_length=50, null=True, blank=True)
     selected_color = models.CharField(max_length=50, null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)  # ✅ Use default instead of auto_now_add
 
     def total_price(self):
         return self.product.get_product_price(
@@ -105,3 +108,29 @@ def create_profile_and_cart(sender, instance, created, **kwargs):
         Cart.objects.create(user=instance)
         if instance.email:
             send_account_activation_email(instance.email, token)
+
+class Order(models.Model):
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='orders'   # <-- add this
+    )
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(
+        max_length=20,
+        choices=(
+            ("Processing", "Processing"),
+            ("Shipped", "Shipped"),
+            ("Out for Delivery", "Out for Delivery"),
+            ("Delivered", "Delivered"),
+        ),
+        default="Processing"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    estimated_delivery = models.CharField(max_length=50, default="3-5 business days")
+
+    def __str__(self):
+        return f"Order #{self.id} by {self.user.username}"

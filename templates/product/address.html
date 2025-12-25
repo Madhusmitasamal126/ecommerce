@@ -1,73 +1,55 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="container my-5">
-    <h2 class="fw-bold mb-4 text-primary text-center">Checkout: Confirm or Add Address</h2>
+    <h2 class="fw-bold text-center text-primary mb-5">
+        <i class="bi bi-geo-alt-fill"></i> Choose or Add Address
+    </h2>
 
-    <!-- Cart Summary -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card shadow-sm border-primary">
-                <div class="card-header bg-primary text-white">
-                    <i class="bi bi-cart"></i> Cart Summary
-                </div>
-                <div class="card-body">
-                    <ul class="list-group mb-3">
-                        {% for item in checkout_cart %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span><i class="bi bi-box-seam"></i> {{ item.product.pro_name }} (x{{ item.quantity }})</span>
-                                <span class="fw-bold">₹{{ item.total_price|floatformat:2 }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <p class="fw-bold text-end">Total: ₹{{ total_price|floatformat:2 }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
+    <div class="row g-4">
         <!-- Saved Addresses -->
-        <div class="col-lg-6 mb-4">
-            <h5 class="mb-3 text-success"><i class="bi bi-geo-alt-fill"></i> Your Saved Addresses</h5>
+        <div class="col-lg-6">
+            <h5 class="mb-3">Saved Addresses</h5>
             {% if addresses %}
                 {% for addr in addresses %}
-                    <div class="card mb-3 shadow-sm address-card {% if addr.default %}border-success bg-light{% endif %}">
+                    <div class="card mb-3 shadow-sm border-0 rounded-4 hover-shadow">
                         <div class="card-body">
-                            <h6 class="fw-bold">{{ addr.full_name }}</h6>
-                            <p><i class="bi bi-house-door-fill"></i> {{ addr.street_address }}, {{ addr.city }}, {{ addr.state }}, {{ addr.postal_code }}, {{ addr.country }}</p>
-                            <p><i class="bi bi-telephone-fill"></i> {{ addr.phone }}</p>
-                            <div class="d-flex justify-content-between mt-3">
-                                <form method="post" action="">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold mb-1">{{ addr.full_name }}</h6>
+                                    <p class="mb-1 text-muted">
+                                        <i class="bi bi-house-door-fill"></i> {{ addr.street_address }}, {{ addr.city }}, {{ addr.state }} - {{ addr.postal_code }}
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        <i class="bi bi-telephone-fill"></i> {{ addr.country }} | Phone: {{ addr.phone }}
+                                    </p>
+                                </div>
+                                <form method="post" class="ms-3">
                                     {% csrf_token %}
                                     <input type="hidden" name="selected_address" value="{{ addr.id }}">
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <i class="bi bi-check-lg"></i> Confirm
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-check-circle"></i> Use
                                     </button>
-                                </form>
-
-                                <form method="post" action="{% url 'delete_address' addr.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Remove</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             {% else %}
-                <p class="text-muted">No saved addresses yet. Add a new one.</p>
+                <p class="text-muted">No saved addresses found. Add a new address to proceed.</p>
             {% endif %}
         </div>
 
-        <!-- Add / Update Address Form -->
+        <!-- Add New Address -->
         <div class="col-lg-6">
-            <h5 class="mb-3 text-info"><i class="bi bi-plus-circle"></i> Add / Update Address</h5>
-            <div class="card shadow-sm border-info">
+            <h5 class="mb-3">Add New Address</h5>
+            <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <button type="submit" class="btn btn-success w-100 mt-3"><i class="bi bi-save"></i> Save & Confirm</button>
+                        <button type="submit" class="btn btn-success w-100 mt-3">
+                            <i class="bi bi-plus-circle-fill"></i> Save & Use This Address
+                        </button>
                     </form>
                 </div>
             </div>
@@ -75,20 +57,22 @@
     </div>
 </div>
 
-<!-- ✅ Always show payment button -->
-<div class="text-center mt-4">
-    <a href="{% url 'payment' %}" class="btn btn-success btn-lg">
-        <i class="bi bi-cash-coin"></i> Continue to Payment
-    </a>
-</div>
-
 <style>
-.address-card {
-    transition: transform 0.3s, box-shadow 0.3s;
+/* Hover effect for address cards */
+.hover-shadow:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transition: 0.3s;
 }
-.address-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+
+/* Optional: style form fields */
+.card-body form input, .card-body form select, .card-body form textarea {
+    border-radius: 0.35rem;
+    padding: 0.5rem;
+}
+
+/* Add spacing between buttons and fields */
+.card-body form button {
+    margin-top: 0.5rem;
 }
 </style>
 {% endblock %}

@@ -1,30 +1,129 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Payment - MyShop{% endblock %}
+
 {% block content %}
 <div class="container my-5">
-  <h2>Payment</h2>
-  <p class="fw-bold">Total Payable: ₹{{ total_price }}</p>
+    <h2 class="mb-4 fw-bold text-center text-primary">💳 Payment Options</h2>
 
-  <button id="rzp-button" class="btn btn-success">Pay Now</button>
+    {% if cart_items %}
+    <div class="row g-4">
+        <!-- Order Summary -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white fw-bold">Order Summary</div>
+                <div class="card-body">
+                    <ul class="list-group mb-3">
+                        {% for item in cart_items %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ item.product.pro_name }}</strong> x {{ item.quantity }}
+                                <br>
+                                <small class="text-muted">₹{{ item.product.price|floatformat:2 }} each</small>
+                            </div>
+                            <span class="fw-bold text-success">₹{{ item.total_price|floatformat:2 }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="fw-bold fs-5">Total:</span>
+                        <span class="fw-bold fs-5 text-success">₹{{ total_price|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script>
-      var options = {
-          "key": "rzp_test_RBbwsG3RFwN4N1",
-          "amount": "{{ payment.amount }}",
-          "currency": "INR",
-          "name": "MyShop",
-          "description": "Order Payment",
-          "order_id": "{{ payment.id }}",
-          "handler": function (response){
-              window.location.href = "{% url 'order_confirmation' %}";
-          },
-          "theme": { "color": "#0d6efd" }
-      };
-      var rzp1 = new Razorpay(options);
-      document.getElementById("rzp-button").onclick = function(e){
-          rzp1.open();
-          e.preventDefault();
-      }
-  </script>
+        <!-- Payment Methods -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100 p-4">
+                <h5 class="fw-bold mb-4">Choose Payment Method</h5>
+
+                <!-- Cash on Delivery -->
+                <form method="post" action="{% url 'cash_on_delivery' %}" class="mb-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100 py-3 rounded-pill shadow-sm">
+                        <i class="bi bi-cash-stack me-2"></i> Cash on Delivery
+                    </button>
+                </form>
+
+                <!-- Razorpay Online Payment -->
+                <button id="razorpay-btn" class="btn btn-primary w-100 py-3 rounded-pill shadow-sm">
+                    <i class="bi bi-credit-card-2-front me-2"></i> Pay Online
+                </button>
+
+                <p class="text-muted mt-3 small text-center">
+                    Secure payment powered by Razorpay
+                </p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center py-5">
+        <h5>No items in your cart.</h5>
+        <a href="/" class="btn btn-outline-primary mt-3">Continue Shopping</a>
+    </div>
+    {% endif %}
 </div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('razorpay-btn').addEventListener('click', function(e) {
+    const options = {
+        "key": "{{ razorpay_key }}",
+        "amount": "{{ total_price|floatformat:0 }}00",
+        "currency": "INR",
+        "name": "MyShop",
+        "description": "Complete your payment",
+        "image": "{% static 'img/logo1.png' %}",
+        "order_id": "{{ payment.id }}",
+        "handler": function(response){
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{% url 'payment_success' %}";
+
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = 'csrfmiddlewaretoken';
+            csrf.value = '{{ csrf_token }}';
+            form.appendChild(csrf);
+
+            const razorpay_id = document.createElement('input');
+            razorpay_id.type = 'hidden';
+            razorpay_id.name = 'razorpay_payment_id';
+            razorpay_id.value = response.razorpay_payment_id;
+            form.appendChild(razorpay_id);
+
+            const razorpay_order = document.createElement('input');
+            razorpay_order.type = 'hidden';
+            razorpay_order.name = 'razorpay_order_id';
+            razorpay_order.value = response.razorpay_order_id;
+            form.appendChild(razorpay_order);
+
+            const signature = document.createElement('input');
+            signature.type = 'hidden';
+            signature.name = 'razorpay_signature';
+            signature.value = response.razorpay_signature;
+            form.appendChild(signature);
+
+            document.body.appendChild(form);
+            form.submit();
+        },
+        "prefill": {"name": "{{ user.username }}","email": "{{ user.email }}"},
+        "theme": {"color": "#0d6efd"}
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+});
+</script>
+
+<style>
+.btn:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+}
+.card-header {
+    font-size: 1.1rem;
+}
+</style>
 {% endblock %}
